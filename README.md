@@ -1,5 +1,7 @@
 # U.S. Energy Markets Dashboard
 
+Check the Deployed app here - [Link](https://eia-data.streamlit.app/)
+
 A live dashboard for U.S. crude oil, natural gas, and refined product
 fundamentals, pulled straight from the **EIA Open Data API** and rendered as
 branded, interactive charts. Built to mirror the weekly workflow of an energy
