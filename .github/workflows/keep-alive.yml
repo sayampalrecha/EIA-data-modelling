@@ -1,0 +1,27 @@
+name: Keep Streamlit Alive
+
+on:
+  schedule:
+    # Runs at 00:00 every 5 days
+    - cron: '0 0 */5 * *'
+  workflow_dispatch: # Allows you to manually trigger it from the GitHub UI
+
+permissions:
+  contents: write # Grants the action permission to push code
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create empty commit
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # The --allow-empty flag creates a commit without changing any files
+          git commit --allow-empty -m "chore: auto empty commit to prevent Streamlit sleep"
+          
+          git push
