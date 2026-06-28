@@ -37,7 +37,7 @@ def inject_brand() -> None:
       .stApp {{ background: {Brand.INK}; color: {Brand.TEXT}; }}
       h1, h2, h3 {{ font-family: '{Brand.FONT_DISPLAY}', sans-serif !important;
                     color: {Brand.TEXT}; letter-spacing: -0.01em; }}
-      .block-container {{ padding-top: 2.2rem; max-width: 1280px; }}
+      .block-container {{ padding-top: 4.5rem; max-width: 1280px; }}
       .kpi {{ background: {Brand.PANEL}; border: 1px solid {Brand.GRID};
               border-radius: 10px; padding: 14px 16px; height: 100%; }}
       .kpi .name {{ color: {Brand.MUTED}; font-size: 12px; font-weight: 500;
@@ -49,6 +49,7 @@ def inject_brand() -> None:
       .up {{ color: {Brand.UP}; }} .down {{ color: {Brand.DOWN}; }}
       .eyebrow {{ color: {Brand.CRUDE}; font-family: '{Brand.FONT_MONO}', monospace;
                   font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }}
+      #MainMenu {{visibility: hidden;}} header {{visibility: visible;}} footer {{visibility: hidden;}}
     </style>
     """, unsafe_allow_html=True)
 
@@ -92,8 +93,6 @@ def kpi_card(series: Series, df: pd.DataFrame) -> str:
 
 def render():
     inject_brand()
-    st.markdown("<div class='eyebrow'>Policy · Economics · Research</div>",
-                unsafe_allow_html=True)
     st.title("U.S. Energy Markets Dashboard")
     st.caption("Weekly fundamentals and spot prices, sourced live from the U.S. "
                "Energy Information Administration (EIA) Open Data API.")
@@ -103,8 +102,6 @@ def render():
         st.header("Controls")
         years_back = st.slider("History (years)", 2, 12, 6)
         st.button("Refresh data", on_click=st.cache_data.clear)
-        st.caption("Data cached 1 hour. EIA updates weekly fundamentals "
-                   "Wednesday/Thursday.")
 
     start = (pd.Timestamp.today() - pd.DateOffset(years=years_back)).strftime("%Y-%m-%d")
 
@@ -118,53 +115,59 @@ def render():
         st.stop()
 
     # ---- KPI strip ----
-    kpi_order = ["wti", "henry_hub", "crude_stocks", "ng_storage",
-                 "refinery_util", "product_supplied"]
-    cols = st.columns(len(kpi_order))
-    for col, key in zip(cols, kpi_order):
-        s = SERIES_BY_KEY[key]
-        col.markdown(kpi_card(s, data[key]), unsafe_allow_html=True)
+    kpi_row1 = ["wti", "henry_hub", "crude_stocks"]
+    kpi_row2 = ["ng_storage", "refinery_util", "product_supplied"]
+    for row in [kpi_row1, kpi_row2]:
+        cols = st.columns(3)
+        for col, key in zip(cols, row):
+            s = SERIES_BY_KEY[key]
+            col.markdown(kpi_card(s, data[key]), unsafe_allow_html=True)
 
     st.divider()
 
     tab_crude, tab_gas, tab_prod, tab_price = st.tabs(
         ["Crude Oil", "Natural Gas", "Products & Demand", "Prices"])
 
+    lookback_days = years_back * 365
+
     with tab_crude:
         c1, c2 = st.columns(2)
         c1.plotly_chart(seasonal_chart(data["crude_stocks"],
-                        SERIES_BY_KEY["crude_stocks"], years=5),
+                        SERIES_BY_KEY["crude_stocks"], years=years_back),
                         use_container_width=True)
         c2.plotly_chart(line_chart(data["crude_prod"],
-                        SERIES_BY_KEY["crude_prod"]), use_container_width=True)
+                        SERIES_BY_KEY["crude_prod"], lookback_days=lookback_days),
+                        use_container_width=True)
         st.plotly_chart(line_chart(data["refinery_util"],
-                        SERIES_BY_KEY["refinery_util"]), use_container_width=True)
+                        SERIES_BY_KEY["refinery_util"], lookback_days=lookback_days),
+                        use_container_width=True)
 
     with tab_gas:
         st.plotly_chart(seasonal_chart(data["ng_storage"],
-                        SERIES_BY_KEY["ng_storage"], years=5),
+                        SERIES_BY_KEY["ng_storage"], years=years_back),
                         use_container_width=True)
-        st.caption("The shaded band is the 5-year weekly min–max range; the dotted "
-                   "line is the 5-year average. Position vs. the band is the first "
+        st.caption(f"The shaded band is the {years_back}-year weekly min–max range; the dotted "
+                   f"line is the {years_back}-year average. Position vs. the band is the first "
                    "thing a gas analyst checks each Thursday.")
 
     with tab_prod:
         c1, c2 = st.columns(2)
         c1.plotly_chart(seasonal_chart(data["gasoline_stocks"],
-                        SERIES_BY_KEY["gasoline_stocks"], years=5),
+                        SERIES_BY_KEY["gasoline_stocks"], years=years_back),
                         use_container_width=True)
         c2.plotly_chart(seasonal_chart(data["distillate_stocks"],
-                        SERIES_BY_KEY["distillate_stocks"], years=5),
+                        SERIES_BY_KEY["distillate_stocks"], years=years_back),
                         use_container_width=True)
         st.plotly_chart(line_chart(data["product_supplied"],
-                        SERIES_BY_KEY["product_supplied"]), use_container_width=True)
+                        SERIES_BY_KEY["product_supplied"], lookback_days=lookback_days),
+                        use_container_width=True)
 
     with tab_price:
         c1, c2 = st.columns(2)
-        c1.plotly_chart(line_chart(data["wti"], SERIES_BY_KEY["wti"]),
-                        use_container_width=True)
-        c2.plotly_chart(line_chart(data["henry_hub"], SERIES_BY_KEY["henry_hub"]),
-                        use_container_width=True)
+        c1.plotly_chart(line_chart(data["wti"], SERIES_BY_KEY["wti"],
+                        lookback_days=lookback_days), use_container_width=True)
+        c2.plotly_chart(line_chart(data["henry_hub"], SERIES_BY_KEY["henry_hub"],
+                        lookback_days=lookback_days), use_container_width=True)
 
     st.divider()
     st.caption("Source: U.S. Energy Information Administration. Built for "
