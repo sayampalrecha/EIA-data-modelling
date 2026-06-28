@@ -61,13 +61,5 @@ flows through the KPIs, tabs, and caching automatically.
 PYTHONPATH=. python tests/test_pipeline.py
 ```
 
-## Notes
-
-- Data is cached for one hour (`st.cache_data`) so widget changes don't re-hit
-  the API. EIA publishes weekly petroleum data Wednesday and gas storage
-  Thursday.
-- Series IDs use the EIA `/v2/seriesid/` compatibility endpoint, so the
-  well-known IDs in `config.py` work without navigating the v2 route tree.
-
 Source: U.S. Energy Information Administration. Built for portfolio /
 demonstration purposes.
