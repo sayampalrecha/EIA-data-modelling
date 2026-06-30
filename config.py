@@ -10,23 +10,23 @@ from typing import Optional
 
 
 # --------------------------------------------------------------------------
-# Brand tokens — an "energy desk" identity, not default Streamlit gray.
-# Crude = amber, natural gas = teal. Mono numerals for a trading-desk feel.
+# Brand tokens — API house style: white background, navy primary, blue accents.
+# Matches the American Petroleum Institute's published chart visual language.
 # --------------------------------------------------------------------------
 class Brand:
-    INK = "#11161C"          # page background
-    PANEL = "#1A2129"        # cards / chart backgrounds
-    GRID = "#2A333D"         # gridlines, hairline borders
-    TEXT = "#E6EBF0"         # primary text
-    MUTED = "#8A97A6"        # secondary text, captions
+    INK = "#FFFFFF"          # page background
+    PANEL = "#F7F9FC"        # cards / chart backgrounds
+    GRID = "#DDE3EA"         # gridlines, hairline borders
+    TEXT = "#0D1B2A"         # primary text — deep navy
+    MUTED = "#5A6A7A"        # secondary text, captions
 
-    CRUDE = "#E8A33D"        # primary accent — crude oil (amber)
-    GAS = "#3FA7A0"          # secondary accent — natural gas (teal)
-    PRODUCT = "#C77DFF"      # petroleum products (violet)
+    CRUDE = "#1B4F8A"        # primary accent — API navy blue (crude)
+    GAS = "#2E86C1"          # secondary accent — mid blue (natural gas)
+    PRODUCT = "#1A6B5A"      # petroleum products — teal-green
 
-    UP = "#4FB477"           # positive WoW / build
-    DOWN = "#E5544B"         # negative WoW / draw
-    BAND = "rgba(138,151,166,0.18)"  # 5-year range fill
+    UP = "#1A7A3C"           # positive WoW
+    DOWN = "#C0392B"         # negative WoW / draw
+    BAND = "rgba(30,90,160,0.10)"  # historical range fill — light blue wash
 
     FONT_DISPLAY = "Space Grotesk"
     FONT_BODY = "Inter"

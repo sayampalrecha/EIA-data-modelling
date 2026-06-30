@@ -15,7 +15,7 @@ import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
 
-from analytics import latest_change
+from analytics import days_of_supply, latest_change
 from charts import line_chart, seasonal_chart
 from config import SERIES_BY_KEY, Brand, Series
 from eia_client import EIAClient, EIAError
@@ -35,13 +35,16 @@ def inject_brand() -> None:
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap');
       .stApp {{ background: {Brand.INK}; color: {Brand.TEXT}; }}
+      [data-testid="stSidebar"] {{ background: {Brand.PANEL}; border-right: 1px solid {Brand.GRID}; color: {Brand.TEXT}; }}
+      [data-testid="stSidebar"] * {{ color: {Brand.TEXT} !important; background: transparent !important; }}
       h1, h2, h3 {{ font-family: '{Brand.FONT_DISPLAY}', sans-serif !important;
                     color: {Brand.TEXT}; letter-spacing: -0.01em; }}
       .block-container {{ padding-top: 4.5rem; max-width: 1280px; }}
-      .kpi {{ background: {Brand.PANEL}; border: 1px solid {Brand.GRID};
-              border-radius: 10px; padding: 14px 16px; height: 100%; }}
-      .kpi .name {{ color: {Brand.MUTED}; font-size: 12px; font-weight: 500;
-                    text-transform: uppercase; letter-spacing: 0.04em; }}
+      .kpi {{ background: {Brand.INK}; border: 1px solid {Brand.GRID};
+              border-left: 3px solid {Brand.CRUDE};
+              border-radius: 6px; padding: 14px 16px; height: 100%; }}
+      .kpi .name {{ color: {Brand.MUTED}; font-size: 11px; font-weight: 600;
+                    text-transform: uppercase; letter-spacing: 0.06em; }}
       .kpi .val {{ font-family: '{Brand.FONT_MONO}', monospace; font-size: 26px;
                    color: {Brand.TEXT}; margin: 4px 0 2px; }}
       .kpi .unit {{ color: {Brand.MUTED}; font-size: 12px; }}
@@ -49,6 +52,9 @@ def inject_brand() -> None:
       .up {{ color: {Brand.UP}; }} .down {{ color: {Brand.DOWN}; }}
       .eyebrow {{ color: {Brand.CRUDE}; font-family: '{Brand.FONT_MONO}', monospace;
                   font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }}
+      button[data-baseweb="tab"] {{ color: {Brand.MUTED} !important; font-weight: 500; }}
+      button[data-baseweb="tab"][aria-selected="true"] {{ color: {Brand.CRUDE} !important; font-weight: 600; }}
+      div.stSlider > div[data-baseweb="slider"] > div:first-child > div {{ background: {Brand.CRUDE} !important; }}
       #MainMenu {{visibility: hidden;}} header {{visibility: visible;}} footer {{visibility: hidden;}}
     </style>
     """, unsafe_allow_html=True)
@@ -123,8 +129,8 @@ def render():
             s = SERIES_BY_KEY[key]
             col.markdown(kpi_card(s, data[key]), unsafe_allow_html=True)
 
-    st.divider()
-
+    # Days of Supply — API's headline metric
+    
     tab_crude, tab_gas, tab_prod, tab_price = st.tabs(
         ["Crude Oil", "Natural Gas", "Products & Demand", "Prices"])
 
@@ -133,7 +139,8 @@ def render():
     with tab_crude:
         c1, c2 = st.columns(2)
         c1.plotly_chart(seasonal_chart(data["crude_stocks"],
-                        SERIES_BY_KEY["crude_stocks"], years=years_back),
+                        SERIES_BY_KEY["crude_stocks"], years=years_back,
+                        exclude_years=[2020]),
                         use_container_width=True)
         c2.plotly_chart(line_chart(data["crude_prod"],
                         SERIES_BY_KEY["crude_prod"], lookback_days=lookback_days),
@@ -144,7 +151,8 @@ def render():
 
     with tab_gas:
         st.plotly_chart(seasonal_chart(data["ng_storage"],
-                        SERIES_BY_KEY["ng_storage"], years=years_back),
+                        SERIES_BY_KEY["ng_storage"], years=years_back,
+                        exclude_years=[2020]),
                         use_container_width=True)
         st.caption(f"The shaded band is the {years_back}-year weekly min–max range; the dotted "
                    f"line is the {years_back}-year average. Position vs. the band is the first "
@@ -153,10 +161,12 @@ def render():
     with tab_prod:
         c1, c2 = st.columns(2)
         c1.plotly_chart(seasonal_chart(data["gasoline_stocks"],
-                        SERIES_BY_KEY["gasoline_stocks"], years=years_back),
+                        SERIES_BY_KEY["gasoline_stocks"], years=years_back,
+                        exclude_years=[2020]),
                         use_container_width=True)
         c2.plotly_chart(seasonal_chart(data["distillate_stocks"],
-                        SERIES_BY_KEY["distillate_stocks"], years=years_back),
+                        SERIES_BY_KEY["distillate_stocks"], years=years_back,
+                        exclude_years=[2020]),
                         use_container_width=True)
         st.plotly_chart(line_chart(data["product_supplied"],
                         SERIES_BY_KEY["product_supplied"], lookback_days=lookback_days),
