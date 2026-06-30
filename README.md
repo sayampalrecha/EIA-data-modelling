@@ -61,5 +61,4 @@ flows through the KPIs, tabs, and caching automatically.
 PYTHONPATH=. python tests/test_pipeline.py
 ```
 
-Source: U.S. Energy Information Administration. Built for portfolio /
-demonstration purposes.
+Source: U.S. Energy Information Administration.
