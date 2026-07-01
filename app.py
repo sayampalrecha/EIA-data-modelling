@@ -16,7 +16,7 @@ import streamlit as st
 from dotenv import load_dotenv
 
 from analytics import days_of_supply, latest_change
-from charts import line_chart, seasonal_chart
+from charts import line_chart, line_chart_with_ma, seasonal_chart
 from config import SERIES_BY_KEY, Brand, Series
 from eia_client import EIAClient, EIAError
 
@@ -111,7 +111,6 @@ def render():
 
     start = (pd.Timestamp.today() - pd.DateOffset(years=years_back)).strftime("%Y-%m-%d")
 
-    # Fetch everything once (cached), surface a clean error if the key is bad.
     try:
         data = {k: load_series(s.eia_id, start) for k, s in SERIES_BY_KEY.items()}
     except EIAError as err:
@@ -168,9 +167,13 @@ def render():
                         SERIES_BY_KEY["distillate_stocks"], years=years_back,
                         exclude_years=[2020]),
                         use_container_width=True)
-        st.plotly_chart(line_chart(data["product_supplied"],
-                        SERIES_BY_KEY["product_supplied"], lookback_days=lookback_days),
+        st.plotly_chart(line_chart_with_ma(data["product_supplied"],
+                        SERIES_BY_KEY["product_supplied"],
+                        lookback_days=lookback_days, ma_window=4),
                         use_container_width=True)
+        st.caption("Dotted line = raw weekly EIA report. Solid line = 4-week rolling "
+                   "average, smoothing shipping and reporting noise to show the "
+                   "underlying demand trend.")
 
     with tab_price:
         c1, c2 = st.columns(2)
@@ -179,9 +182,9 @@ def render():
         c2.plotly_chart(line_chart(data["henry_hub"], SERIES_BY_KEY["henry_hub"],
                         lookback_days=lookback_days), use_container_width=True)
 
+        # 3-2-1 Crack Spread — refinery margin proxy
     st.divider()
-    st.caption("Source: U.S. Energy Information Administration. Built for "
-               "portfolio/demonstration purposes.")
+    st.caption("Source: U.S. Energy Information Administration.")
 
 
 if __name__ == "__main__":

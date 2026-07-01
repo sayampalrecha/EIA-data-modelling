@@ -20,13 +20,17 @@ class Brand:
     TEXT = "#0D1B2A"         # primary text — deep navy
     MUTED = "#5A6A7A"        # secondary text, captions
 
-    CRUDE = "#1B4F8A"        # primary accent — API navy blue (crude)
-    GAS = "#2E86C1"          # secondary accent — mid blue (natural gas)
-    PRODUCT = "#1A6B5A"      # petroleum products — teal-green
+    # Asset color mental models — industry standard
+    CRUDE = "#4A5568"        # slate/charcoal — crude oil & refined assets
+    GAS = "#2E86C1"          # blue — natural gas
+    GASOLINE = "#C0392B"     # red — motor gasoline stocks
+    DISTILLATE = "#E8A33D"   # amber — distillate/diesel stocks
+    PRODUCT = "#6B7280"      # neutral grey — demand/other products
+    CRACK = "#7B2D8B"        # purple — crack spread (derived margin metric)
 
     UP = "#1A7A3C"           # positive WoW
     DOWN = "#C0392B"         # negative WoW / draw
-    BAND = "rgba(30,90,160,0.10)"  # historical range fill — light blue wash
+    BAND = "rgba(74,85,104,0.12)"  # historical range fill
 
     FONT_DISPLAY = "Space Grotesk"
     FONT_BODY = "Inter"
@@ -50,7 +54,7 @@ class Series:
 # Well-known, stable EIA series IDs. The /v2/seriesid/{id} endpoint accepts
 # these v1-style IDs directly, so we don't have to navigate the v2 route tree.
 SERIES = [
-    # --- Crude oil ---
+    # --- Crude oil & refined assets (slate/charcoal) ---
     Series("crude_stocks", "PET.WCESTUS1.W",
            "U.S. Crude Oil Stocks (ex-SPR)", "thsd bbl",
            Brand.CRUDE, "crude", seasonal=True, invert_delta=True),
@@ -63,25 +67,28 @@ SERIES = [
     Series("product_supplied", "PET.WRPUPUS2.W",
            "Total Products Supplied (demand proxy)", "thsd bbl/d",
            Brand.PRODUCT, "product"),
+
+    # --- Products (red = gasoline, amber = distillate) ---
     Series("gasoline_stocks", "PET.WGTSTUS1.W",
            "Motor Gasoline Stocks", "thsd bbl",
-           Brand.PRODUCT, "product", seasonal=True, invert_delta=True),
+           Brand.GASOLINE, "product", seasonal=True, invert_delta=True),
     Series("distillate_stocks", "PET.WDISTUS1.W",
            "Distillate Stocks", "thsd bbl",
-           Brand.PRODUCT, "product", seasonal=True, invert_delta=True),
+           Brand.DISTILLATE, "product", seasonal=True, invert_delta=True),
 
-    # --- Natural gas ---
+    # --- Natural gas (blue) ---
     Series("ng_storage", "NG.NW2_EPG0_SWO_R48_BCF.W",
            "Lower 48 Working Gas in Storage", "Bcf",
            Brand.GAS, "gas", seasonal=True),
 
-    # --- Prices (daily) ---
+    # --- Prices (daily spot) ---
     Series("wti", "PET.RWTC.D",
            "WTI Spot (Cushing)", "$/bbl",
            Brand.CRUDE, "price", decimals=2),
     Series("henry_hub", "NG.RNGWHHD.D",
            "Henry Hub Spot", "$/MMBtu",
            Brand.GAS, "price", decimals=2),
+
 ]
 
 SERIES_BY_KEY = {s.key: s for s in SERIES}

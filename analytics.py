@@ -120,3 +120,48 @@ def with_week_of_year(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
     out["woy"] = out.index.isocalendar().week.astype(int)
     return out
+
+
+def rolling_mean(df: pd.DataFrame, window: int = 4) -> pd.DataFrame:
+    """
+    4-week rolling average over the 'value' column.
+    Smooths short-term shipping/reporting noise in demand series like
+    Total Products Supplied without distorting the underlying trend.
+    """
+    if df.empty:
+        return df.copy()
+    out = df.copy()
+    out["rolling"] = out["value"].rolling(window, min_periods=1).mean()
+    return out
+
+
+def crack_spread_321(
+    wti_df: pd.DataFrame,
+    gasoline_df: pd.DataFrame,
+    distillate_df: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    3-2-1 crack spread: refinery margin proxy for cracking 3 barrels of crude
+    into 2 barrels of gasoline and 1 barrel of distillate.
+
+    Formula: ((2 * gasoline_$/bbl) + (1 * distillate_$/bbl) - (3 * wti_$/bbl)) / 3
+
+    Gasoline and distillate inputs are $/gal (EIA weekly spot) → convert to
+    $/bbl by multiplying by 42 (gallons per barrel).
+
+    Returns a DataFrame indexed by date with a single 'value' column in $/bbl.
+    """
+    if wti_df.empty or gasoline_df.empty or distillate_df.empty:
+        return pd.DataFrame(columns=["value"])
+
+    # WTI is daily — resample to weekly mean to align with product prices
+    wti_w = wti_df["value"].resample("W").mean().rename("wti")
+    gas_bbl = (gasoline_df["value"] * 42).rename("gas")
+    dist_bbl = (distillate_df["value"] * 42).rename("dist")
+
+    combined = pd.concat([wti_w, gas_bbl, dist_bbl], axis=1).dropna()
+    if combined.empty:
+        return pd.DataFrame(columns=["value"])
+
+    combined["value"] = ((2 * combined["gas"]) + combined["dist"] - (3 * combined["wti"])) / 3
+    return combined[["value"]]
