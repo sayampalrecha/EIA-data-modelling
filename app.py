@@ -71,6 +71,26 @@ def load_series(eia_id: str, start: str) -> pd.DataFrame:
     return get_client().fetch(eia_id, start=start)
 
 
+def download_button(keys: list[str], data: dict, filename: str) -> None:
+    """Merge selected series into one CSV and render a Streamlit download button."""
+    frames = []
+    for k in keys:
+        df = data[k]
+        if not df.empty:
+            frames.append(df["value"].rename(SERIES_BY_KEY[k].label))
+    if not frames:
+        return
+    combined = pd.concat(frames, axis=1).sort_index()
+    combined.index.name = "date"
+    csv = combined.to_csv()
+    st.download_button(
+        label="Download data (CSV)",
+        data=csv,
+        file_name=filename,
+        mime="text/csv",
+    )
+
+
 def kpi_card(series: Series, df: pd.DataFrame) -> str:
     info = latest_change(df)
     if pd.isna(info["value"]):
@@ -147,6 +167,8 @@ def render():
         st.plotly_chart(line_chart(data["refinery_util"],
                         SERIES_BY_KEY["refinery_util"], lookback_days=lookback_days),
                         use_container_width=True)
+        download_button(["crude_stocks", "crude_prod", "refinery_util"],
+                        data, "crude_oil_data.csv")
 
     with tab_gas:
         st.plotly_chart(seasonal_chart(data["ng_storage"],
@@ -156,6 +178,7 @@ def render():
         st.caption(f"The shaded band is the {years_back}-year weekly min–max range; the dotted "
                    f"line is the {years_back}-year average. Position vs. the band is the first "
                    "thing a gas analyst checks each Thursday.")
+        download_button(["ng_storage"], data, "natural_gas_storage.csv")
 
     with tab_prod:
         c1, c2 = st.columns(2)
@@ -174,6 +197,8 @@ def render():
         st.caption("Dotted line = raw weekly EIA report. Solid line = 4-week rolling "
                    "average, smoothing shipping and reporting noise to show the "
                    "underlying demand trend.")
+        download_button(["gasoline_stocks", "distillate_stocks", "product_supplied"],
+                        data, "products_demand_data.csv")
 
     with tab_price:
         c1, c2 = st.columns(2)
@@ -181,6 +206,7 @@ def render():
                         lookback_days=lookback_days), use_container_width=True)
         c2.plotly_chart(line_chart(data["henry_hub"], SERIES_BY_KEY["henry_hub"],
                         lookback_days=lookback_days), use_container_width=True)
+        download_button(["wti", "henry_hub"], data, "prices_data.csv")
 
         # 3-2-1 Crack Spread — refinery margin proxy
     st.divider()
