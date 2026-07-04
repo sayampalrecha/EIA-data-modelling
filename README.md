@@ -4,11 +4,8 @@ Check the Deployed app here - [Link](https://eia-data.streamlit.app/)
 
 A live dashboard for U.S. crude oil, natural gas, and refined product
 fundamentals, pulled straight from the **EIA Open Data API** and rendered as
-branded, interactive charts. Built to mirror the weekly workflow of an energy
-market analyst: check the spot prices, check inventories against the 5-year
-range, flag what's off-trend.
+branded, interactive charts.
 
-![Signature seasonal chart](preview_seasonal.png)
 
 ## What it shows
 
