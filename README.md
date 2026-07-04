@@ -52,10 +52,4 @@ The code is layered so each piece is independently reusable and testable:
 Want to track another series? Add one row to `SERIES` in `config.py` and it
 flows through the KPIs, tabs, and caching automatically.
 
-## Run the tests
 
-```bash
-PYTHONPATH=. python tests/test_pipeline.py
-```
-
-Source: U.S. Energy Information Administration.
