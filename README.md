@@ -6,7 +6,6 @@ A live dashboard for U.S. crude oil, natural gas, and refined product
 fundamentals, pulled straight from the **EIA Open Data API** and rendered as
 branded, interactive charts.
 
-
 ## What it shows
 
 - **KPI strip** — WTI, Henry Hub, crude stocks, gas storage, refinery
