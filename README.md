@@ -33,7 +33,7 @@ cp .env.example .env          # then paste your free key into .env
 streamlit run app.py
 ```
 
-Get a free API key (takes ~30 seconds): https://www.eia.gov/opendata/register.php
+Get a free API key: https://www.eia.gov/opendata/register.php
 
 ## Architecture
 
