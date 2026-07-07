@@ -18,11 +18,6 @@ st.set_page_config(page_title="U.S. Energy Markets Dashboard",
                    page_icon="▲", layout="wide",
                    initial_sidebar_state="expanded")
 
-
-# --------------------------------------------------------------------------
-# Brand: inject fonts + dark "energy desk" theme. Keeps the look consistent
-# even though Streamlit's native theming is limited.
-# --------------------------------------------------------------------------
 def inject_brand() -> None:
     st.markdown(f"""
     <style>
