@@ -15,7 +15,8 @@ from eia_client import EIAClient, EIAError
 load_dotenv()
 
 st.set_page_config(page_title="U.S. Energy Markets Dashboard",
-                   page_icon="▲", layout="wide")
+                   page_icon="▲", layout="wide",
+                   initial_sidebar_state="expanded")
 
 
 # --------------------------------------------------------------------------
@@ -44,8 +45,8 @@ def inject_brand() -> None:
       .up {{ color: {Brand.UP}; }} .down {{ color: {Brand.DOWN}; }}
       .eyebrow {{ color: {Brand.CRUDE}; font-family: '{Brand.FONT_MONO}', monospace;
                   font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }}
-      button[data-baseweb="tab"] {{ color: {Brand.MUTED} !important; font-weight: 500; }}
-      button[data-baseweb="tab"][aria-selected="true"] {{ color: {Brand.CRUDE} !important; font-weight: 600; }}
+      button[data-baseweb="tab"] {{ color: {Brand.TEXT} !important; font-weight: 500; }}
+      button[data-baseweb="tab"][aria-selected="true"] {{ color: #1B4F8A !important; font-weight: 600; border-bottom: 2px solid #1B4F8A !important; }}
       div.stSlider > div[data-baseweb="slider"] > div:first-child > div {{ background: {Brand.CRUDE} !important; }}
       #MainMenu {{visibility: hidden;}} header {{visibility: hidden;}} footer {{visibility: hidden;}}
       [data-testid="collapsedControl"] {{ background: {Brand.PANEL} !important; color: {Brand.TEXT} !important; border: 1px solid {Brand.GRID} !important; }}
