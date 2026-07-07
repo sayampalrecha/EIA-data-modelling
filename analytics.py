@@ -6,7 +6,6 @@ import pandas as pd
 
 
 def latest_change(df: pd.DataFrame) -> dict:
-    """Latest value plus change vs the previous observation."""
     if df.empty:
         return {"value": np.nan, "delta": np.nan, "pct": np.nan, "date": None}
     s = df["value"].dropna()
@@ -22,21 +21,12 @@ def latest_change(df: pd.DataFrame) -> dict:
         "date": s.index[-1],
     }
 
-
 def seasonal_range(
     df: pd.DataFrame,
     years: int = 5,
     exclude_years: list[int] | None = None,
 ) -> pd.DataFrame:
-    """
-    Build a week-of-year min/max/avg envelope from the last `years` complete
-    years, indexed 1..53. This is the classic "is storage above or below the
-    5-year range?" visual that EIA, IEA, and every gas desk uses.
 
-    exclude_years: calendar years to drop before computing the envelope.
-    Industry convention is to exclude 2020 (COVID demand collapse) so one
-    anomalous year doesn't distort the "normal" band.
-    """
     if df.empty:
         return pd.DataFrame(columns=["woy", "min", "max", "avg"])
 
@@ -58,22 +48,12 @@ def seasonal_range(
     out.index.name = "woy"
     return out.reset_index()
 
-
 def trajectory_projection(
     cur: pd.DataFrame,
     weeks_ahead: int = 12,
     fit_weeks: int = 6,
 ) -> pd.DataFrame:
-    """
-    Fit a linear trend to the last `fit_weeks` of the current year and project
-    it forward `weeks_ahead` weeks. Returns a DataFrame with columns [woy, value]
-    starting from the week after the last observed point.
 
-    This is the "at current draw/build rate, where do we end up?" question that
-    analysts ask heading into summer driving season or winter withdrawal season.
-    Linear extrapolation is intentionally simple — it reflects recent momentum,
-    not a structural forecast.
-    """
     if cur.empty or "woy" not in cur.columns:
         return pd.DataFrame(columns=["woy", "value"])
 
@@ -93,13 +73,8 @@ def trajectory_projection(
     projected = [slope * w + intercept for w in future_woys]
     return pd.DataFrame({"woy": future_woys, "value": projected})
 
-
 def days_of_supply(stocks_df: pd.DataFrame, demand_df: pd.DataFrame) -> dict:
-    """
-    Days of Supply = latest crude stocks (thsd bbl) / latest demand (thsd bbl/d).
-    Result is in days. This is the metric API headlines in their weekly bulletin
-    because it normalises raw barrels for economy size and demand level.
-    """
+
     if stocks_df.empty or demand_df.empty:
         return {"value": np.nan, "date": None}
 
@@ -121,13 +96,8 @@ def with_week_of_year(df: pd.DataFrame) -> pd.DataFrame:
     out["woy"] = out.index.isocalendar().week.astype(int)
     return out
 
-
 def rolling_mean(df: pd.DataFrame, window: int = 4) -> pd.DataFrame:
-    """
-    4-week rolling average over the 'value' column.
-    Smooths short-term shipping/reporting noise in demand series like
-    Total Products Supplied without distorting the underlying trend.
-    """
+
     if df.empty:
         return df.copy()
     out = df.copy()
@@ -140,17 +110,6 @@ def crack_spread_321(
     gasoline_df: pd.DataFrame,
     distillate_df: pd.DataFrame,
 ) -> pd.DataFrame:
-    """
-    3-2-1 crack spread: refinery margin proxy for cracking 3 barrels of crude
-    into 2 barrels of gasoline and 1 barrel of distillate.
-
-    Formula: ((2 * gasoline_$/bbl) + (1 * distillate_$/bbl) - (3 * wti_$/bbl)) / 3
-
-    Gasoline and distillate inputs are $/gal (EIA weekly spot) → convert to
-    $/bbl by multiplying by 42 (gallons per barrel).
-
-    Returns a DataFrame indexed by date with a single 'value' column in $/bbl.
-    """
     if wti_df.empty or gasoline_df.empty or distillate_df.empty:
         return pd.DataFrame(columns=["value"])
 
