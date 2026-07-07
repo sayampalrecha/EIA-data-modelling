@@ -1,10 +1,4 @@
-"""
-Central configuration: the EIA series we track and the visual brand.
 
-Keeping series IDs and styling in one place means the data layer, chart layer,
-and app never disagree about what "crude inventories" means or what color
-"natural gas" should be. Add a row here and it flows through the whole app.
-"""
 from dataclasses import dataclass
 from typing import Optional
 

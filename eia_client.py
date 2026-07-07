@@ -1,17 +1,4 @@
-"""
-Thin, robust wrapper around the EIA v2 API.
 
-Design notes
-------------
-- Uses the /v2/seriesid/{ID} compatibility endpoint so we can pass the
-  well-known v1-style series IDs in config.py without walking the v2 route tree.
-- Returns a tidy pandas DataFrame indexed by date, one column 'value'.
-- Retries transient failures with backoff; raises a clear error on a bad key.
-- No Streamlit imports here on purpose — this layer is pure data so it can be
-  reused in a notebook, a script, or a scheduled job.
-
-Get a free key in ~30 seconds at https://www.eia.gov/opendata/register.php
-"""
 from __future__ import annotations
 
 import time

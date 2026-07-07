@@ -1,12 +1,4 @@
-"""
-U.S. Energy Markets Dashboard — Streamlit front end.
-
-Run locally:
-    streamlit run app.py
-
-It reads EIA_API_KEY from the environment (or a .env file). Data is cached for
-an hour so re-runs and widget changes don't re-hit the API.
-"""
+# This is the streamlit UI that the user sees
 from __future__ import annotations
 
 import os

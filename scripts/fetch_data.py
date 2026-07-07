@@ -1,12 +1,4 @@
-"""
-Fetch all EIA series and write them to data/<key>.csv.
-
-Run locally:
-    python scripts/fetch_data.py
-
-Run in CI (GitHub Actions sets EIA_API_KEY as a secret):
-    python scripts/fetch_data.py
-"""
+# script to fetch all the EIA data
 from __future__ import annotations
 
 import os
