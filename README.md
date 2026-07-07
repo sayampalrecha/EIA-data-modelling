@@ -8,7 +8,7 @@ branded, interactive charts.
 
 ## What it shows
 
-- **KPI ** — WTI, Henry Hub, crude stocks, gas storage, refinery
+- WTI, Henry Hub, crude stocks, gas storage, refinery
   utilization, and product supplied, each with a week-over-week change. Stock
   deltas are color-coded by market impact (a draw reads green).
 - **Crude tab** — stocks vs. 5-year range, field production, refinery runs.
