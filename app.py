@@ -47,7 +47,7 @@ def inject_brand() -> None:
                   font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }}
       button[data-baseweb="tab"] {{ color: {Brand.TEXT} !important; font-weight: 500; }}
       button[data-baseweb="tab"][aria-selected="true"] {{ color: #1B4F8A !important; font-weight: 600; border-bottom: 2px solid #1B4F8A !important; }}
-      div.stSlider > div[data-baseweb="slider"] > div:first-child > div {{ background: {Brand.CRUDE} !important; }}
+      div.stSlider > div[data-baseweb="slider"] > div:first-child > div {{ background: #1B4F8A !important; }}
       #MainMenu {{visibility: hidden;}} header {{visibility: hidden;}} footer {{visibility: hidden;}}
       [data-testid="collapsedControl"] {{ background: {Brand.PANEL} !important; color: {Brand.TEXT} !important; border: 1px solid {Brand.GRID} !important; }}
       .stDownloadButton > button {{
