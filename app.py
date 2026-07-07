@@ -48,6 +48,21 @@ def inject_brand() -> None:
       button[data-baseweb="tab"][aria-selected="true"] {{ color: {Brand.CRUDE} !important; font-weight: 600; }}
       div.stSlider > div[data-baseweb="slider"] > div:first-child > div {{ background: {Brand.CRUDE} !important; }}
       #MainMenu {{visibility: hidden;}} header {{visibility: visible;}} footer {{visibility: hidden;}}
+      [data-testid="collapsedControl"] {{ background: {Brand.PANEL} !important; color: {Brand.TEXT} !important; border: 1px solid {Brand.GRID} !important; }}
+      .stDownloadButton > button {{
+        background: {Brand.INK} !important;
+        color: {Brand.TEXT} !important;
+        border: 1px solid {Brand.GRID} !important;
+        border-radius: 6px !important;
+        font-family: '{Brand.FONT_BODY}', sans-serif !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+      }}
+      .stDownloadButton > button:hover {{
+        border-color: {Brand.CRUDE} !important;
+        color: {Brand.CRUDE} !important;
+        background: {Brand.PANEL} !important;
+      }}
     </style>
     """, unsafe_allow_html=True)
 
