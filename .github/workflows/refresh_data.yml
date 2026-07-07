@@ -1,0 +1,36 @@
+name: Refresh EIA Data
+
+on:
+  schedule:
+    # Wednesday 23:00 UTC (~7pm ET) — after EIA petroleum release
+    - cron: "0 23 * * 3"
+    # Thursday 23:00 UTC — after EIA natural gas storage release
+    - cron: "0 23 * * 4"
+  workflow_dispatch:  # allow manual trigger from GitHub UI
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch EIA data
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: python scripts/fetch_data.py
+
+      - name: Commit updated data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "chore: refresh EIA data $(date -u +%Y-%m-%d)"
+          git push

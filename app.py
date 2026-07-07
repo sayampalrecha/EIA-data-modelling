@@ -65,10 +65,29 @@ def get_client() -> EIAClient:
     return EIAClient(api_key=os.getenv("EIA_API_KEY", ""))
 
 
+DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+
+
 @st.cache_data(ttl=3600, show_spinner=False)
 def load_series(eia_id: str, start: str) -> pd.DataFrame:
     """Cached fetch. Cache key is (eia_id, start), so each series caches once/hr."""
     return get_client().fetch(eia_id, start=start)
+
+
+@st.cache_data(ttl=86400, show_spinner=False)
+def load_series_from_csv(key: str) -> pd.DataFrame:
+    """
+    Read pre-fetched CSV from the data/ folder — no API call needed.
+    Cached for 24 hours since the file only changes when GitHub Action commits.
+    Falls back to an empty DataFrame if the file doesn't exist.
+    """
+    path = os.path.join(DATA_DIR, f"{key}.csv")
+    if not os.path.exists(path):
+        return pd.DataFrame(columns=["value"])
+    df = pd.read_csv(path, index_col="date", parse_dates=True)
+    df.index = pd.to_datetime(df.index, utc=False)
+    df.index.name = "date"
+    return df
 
 
 def download_button(keys: list[str], data: dict, filename: str) -> None:
@@ -126,18 +145,31 @@ def render():
     # Controls
     with st.sidebar:
         st.header("Controls")
-        years_back = st.slider("History (years)", 2, 12, 6)
+        years_back = st.slider("History (years)", 2, 12, 5)
         st.button("Refresh data", on_click=st.cache_data.clear)
 
-    start = (pd.Timestamp.today() - pd.DateOffset(years=years_back)).strftime("%Y-%m-%d")
 
-    try:
-        data = {k: load_series(s.eia_id, start) for k, s in SERIES_BY_KEY.items()}
-    except EIAError as err:
-        st.error(str(err))
-        st.info("Set your key:  export EIA_API_KEY='your-key-here'  (or add it "
-                "to a .env file), then rerun.")
-        st.stop()
+    slider_start = pd.Timestamp.today() - pd.DateOffset(years=years_back)
+
+    # Try CSVs first (committed to repo, refreshed by GitHub Action weekly).
+    # Fall back to live EIA API only if a CSV is missing.
+    raw = {k: load_series_from_csv(k) for k in SERIES_BY_KEY}
+    missing = [k for k, df in raw.items() if df.empty]
+
+    if missing:
+        max_start = (pd.Timestamp.today() - pd.DateOffset(years=12)).strftime("%Y-%m-%d")
+        try:
+            for k in missing:
+                raw[k] = load_series(SERIES_BY_KEY[k].eia_id, max_start)
+        except EIAError as err:
+            st.error(str(err))
+            st.info("Set your key:  export EIA_API_KEY='your-key-here'  (or add it "
+                    "to a .env file), then rerun.")
+            st.stop()
+
+    # Slice to slider window in memory — instant regardless of source
+    data = {k: df[df.index >= slider_start] if not df.empty else df
+            for k, df in raw.items()}
 
     # ---- KPI strip ----
     kpi_row1 = ["wti", "henry_hub", "crude_stocks"]
