@@ -1,5 +1,6 @@
 name: Refresh EIA Data
 
+
 on:
   schedule:
     # Wednesday 23:00 UTC (~7pm ET) — after EIA petroleum release
