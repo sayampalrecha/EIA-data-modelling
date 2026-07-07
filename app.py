@@ -107,7 +107,7 @@ def download_button(keys: list[str], data: dict, filename: str) -> None:
             frames.append(df["value"].rename(SERIES_BY_KEY[k].label))
     if not frames:
         return
-    combined = pd.concat(frames, axis=1).sort_index()
+    combined = pd.concat(frames, axis=1, sort=False).sort_index()
     combined.index.name = "date"
     csv = combined.to_csv()
     st.download_button(
@@ -200,13 +200,13 @@ def render():
         c1.plotly_chart(seasonal_chart(data["crude_stocks"],
                         SERIES_BY_KEY["crude_stocks"], years=years_back,
                         exclude_years=[2020]),
-                        use_container_width=True)
+                        width='stretch')
         c2.plotly_chart(line_chart(data["crude_prod"],
                         SERIES_BY_KEY["crude_prod"], lookback_days=lookback_days),
-                        use_container_width=True)
+                        width='stretch')
         st.plotly_chart(line_chart(data["refinery_util"],
                         SERIES_BY_KEY["refinery_util"], lookback_days=lookback_days),
-                        use_container_width=True)
+                        width='stretch')
         download_button(["crude_stocks", "crude_prod", "refinery_util"],
                         data, "crude_oil_data.csv")
 
@@ -214,7 +214,7 @@ def render():
         st.plotly_chart(seasonal_chart(data["ng_storage"],
                         SERIES_BY_KEY["ng_storage"], years=years_back,
                         exclude_years=[2020]),
-                        use_container_width=True)
+                        width='stretch')
         st.caption(f"The shaded band is the {years_back}-year weekly min–max range; the dotted "
                    f"line is the {years_back}-year average. Position vs. the band is the first "
                    "thing a gas analyst checks each Thursday.")
@@ -225,15 +225,15 @@ def render():
         c1.plotly_chart(seasonal_chart(data["gasoline_stocks"],
                         SERIES_BY_KEY["gasoline_stocks"], years=years_back,
                         exclude_years=[2020]),
-                        use_container_width=True)
+                        width='stretch')
         c2.plotly_chart(seasonal_chart(data["distillate_stocks"],
                         SERIES_BY_KEY["distillate_stocks"], years=years_back,
                         exclude_years=[2020]),
-                        use_container_width=True)
+                        width='stretch')
         st.plotly_chart(line_chart_with_ma(data["product_supplied"],
                         SERIES_BY_KEY["product_supplied"],
                         lookback_days=lookback_days, ma_window=4),
-                        use_container_width=True)
+                        width='stretch')
         st.caption("Dotted line = raw weekly EIA report. Solid line = 4-week rolling "
                    "average, smoothing shipping and reporting noise to show the "
                    "underlying demand trend.")
@@ -243,9 +243,9 @@ def render():
     with tab_price:
         c1, c2 = st.columns(2)
         c1.plotly_chart(line_chart(data["wti"], SERIES_BY_KEY["wti"],
-                        lookback_days=lookback_days), use_container_width=True)
+                        lookback_days=lookback_days), width='stretch')
         c2.plotly_chart(line_chart(data["henry_hub"], SERIES_BY_KEY["henry_hub"],
-                        lookback_days=lookback_days), use_container_width=True)
+                        lookback_days=lookback_days), width='stretch')
         download_button(["wti", "henry_hub"], data, "prices_data.csv")
 
         # 3-2-1 Crack Spread — refinery margin proxy
