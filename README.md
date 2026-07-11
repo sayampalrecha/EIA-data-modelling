@@ -47,8 +47,3 @@ The code is layered so each piece is independently reusable and testable:
 | `charts.py`     | Branded Plotly figure builders                              |
 | `app.py`        | Streamlit layout, caching, KPI strip                        |
 | `tests/`        | Smoke tests for the analytics + chart layers                |
-
-Want to track another series? Add one row to `SERIES` in `config.py` and it
-flows through the KPIs, tabs, and caching automatically.
-
-
