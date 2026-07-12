@@ -17,6 +17,7 @@ branded, interactive charts.
 - **Products & demand tab** — gasoline and distillate stocks vs. range, plus
   total product supplied as a demand proxy.
 - **Prices tab** — WTI and Henry Hub spot.
+- BRENT price plot to show the changes the in prices there
 
 ## The signature visual: the 5-year range band
 
@@ -47,3 +48,5 @@ The code is layered so each piece is independently reusable and testable:
 | `charts.py`     | Branded Plotly figure builders                              |
 | `app.py`        | Streamlit layout, caching, KPI strip                        |
 | `tests/`        | Smoke tests for the analytics + chart layers                |
+
+
