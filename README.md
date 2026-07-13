@@ -17,14 +17,6 @@ branded, interactive charts.
 - **Products & demand tab** — gasoline and distillate stocks vs. range, plus
   total product supplied as a demand proxy.
 - **Prices tab** — WTI and Henry Hub spot.
-- BRENT price plot to show the changes the in prices there
-
-## The signature visual: the 5-year range band
-
-Storage and inventory series are seasonal, so a raw line tells you little. The
-analyst's question is *"where are we versus normal for this week of year?"* The
-seasonal chart shades the 5-year weekly min–max envelope, draws the 5-year
-average, and overlays the current year — so deviations jump out instantly.
 
 ## Setup
 
